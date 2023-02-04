@@ -38,7 +38,7 @@ public class BookService {
   public void loanBook(BookLoanRequest request) {
     Book book = bookRepository.findByName(request.getBookName()).orElseThrow(IllegalArgumentException::new);
     if (userLoanHistoryRepository.findByBookNameAndIsReturn(request.getBookName(), false) != null) {
-      throw new IllegalArgumentException("진작 대출되어 있는 책입니다");
+      throw new IllegalArgumentException("이미 대출된 책입니다.");
     }
 
     User user = userRepository.findByName(request.getUserName()).orElseThrow(IllegalArgumentException::new);
