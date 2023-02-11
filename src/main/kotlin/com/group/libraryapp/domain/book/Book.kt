@@ -1,10 +1,12 @@
 package com.group.libraryapp.domain.book
 
 import java.lang.IllegalArgumentException
+import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 
+@Entity
 class Book(
     val name: String,
 
