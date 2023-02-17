@@ -11,6 +11,7 @@ import com.group.libraryapp.domain.user.loanhistory.UserLoanStatus
 import com.group.libraryapp.dto.book.request.BookLoanRequest
 import com.group.libraryapp.dto.book.request.BookRequest
 import com.group.libraryapp.dto.book.request.BookReturnRequest
+import com.group.libraryapp.dto.book.response.BookStatResponse
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -101,5 +102,53 @@ class BookServiceTest @Autowired constructor(
         val results = userLoanHistoryRepository.findAll()
         assertThat(results).hasSize(1)
         assertThat(results[0].status).isEqualTo(UserLoanStatus.RETURNED)
+    }
+    
+    @Test
+    @DisplayName("책 대여 권수를 정상 확인한다")
+    fun countLoanedBookTest() {
+        //given
+        val savedUser = userRepository.save(User("daeun", null))
+        userLoanHistoryRepository.saveAll(listOf(
+            UserLoanHistory.fixture(savedUser, "A"),
+            UserLoanHistory.fixture(savedUser, "B", UserLoanStatus.RETURNED),
+            UserLoanHistory.fixture(savedUser, "C", UserLoanStatus.RETURNED),
+        ))
+        
+        //when
+        val results = bookService.countLoanedBook()
+        
+        //then
+        assertThat(results).isEqualTo(1)
+    }
+    
+    @Test
+    @DisplayName("분야별 책 권수를 정상 확인한다")
+    fun getBookStatisticsTest() {
+        //given
+        bookRepository.saveAll(listOf(
+            Book.fixture("A", BookType.COMPUTER),
+            Book.fixture("B", BookType.COMPUTER),
+            Book.fixture("C", BookType.ECONOMY),
+        ))
+        
+        //when
+        val results = bookService.getBookStatistics()
+        
+        //then
+        assertThat(results).hasSize(2)
+        assertCount(results, BookType.COMPUTER, 2)
+        assertCount(results, BookType.ECONOMY, 1)
+
+        /*  반복되는 구문을 하나의 함수 assertCount 로 만들어서 씀
+        val computerDto = results.first { result -> result.type == BookType.COMPUTER }
+        assertThat(computerDto.count).isEqualTo(2)
+        val economyDto = results.first { result -> result.type == BookType.ECONOMY }
+        assertThat(economyDto.count).isEqualTo(1)
+        */
+    }
+
+    private fun assertCount(results: List<BookStatResponse>, type: BookType, count: Int) {
+        assertThat(results.first { result -> result.type == type }.count).isEqualTo(count)
     }
 }
