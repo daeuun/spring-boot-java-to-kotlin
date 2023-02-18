@@ -137,8 +137,8 @@ class BookServiceTest @Autowired constructor(
         
         //then
         assertThat(results).hasSize(2)
-        assertCount(results, BookType.COMPUTER, 2)
-        assertCount(results, BookType.ECONOMY, 1)
+        assertCount(results, BookType.COMPUTER, 2L)
+        assertCount(results, BookType.ECONOMY, 1L)
 
         /*  반복되는 구문을 하나의 함수 assertCount 로 만들어서 씀
         val computerDto = results.first { result -> result.type == BookType.COMPUTER }
@@ -148,7 +148,7 @@ class BookServiceTest @Autowired constructor(
         */
     }
 
-    private fun assertCount(results: List<BookStatResponse>, type: BookType, count: Int) {
+    private fun assertCount(results: List<BookStatResponse>, type: BookType, count: Long) {
         assertThat(results.first { result -> result.type == type }.count).isEqualTo(count)
     }
 }
