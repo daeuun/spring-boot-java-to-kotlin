@@ -38,6 +38,16 @@ class BookService(
     }
 
     @Transactional
+    fun loanBookByGPT(request: BookLoanRequest) {
+        val book = bookRepository.findByName(request.bookName) ?: fail()
+        if (userLoanHistoryQuerydslRepository.findModifiedByGPT(request.bookName, UserLoanStatus.LOANED) != null) {
+            throw IllegalArgumentException("이미 대출되어 있는 책입니다.")
+        }
+        val user = userRepository.findByName(request.userName) ?: fail()
+        user.loanBook(book)
+    }
+
+    @Transactional
     fun returnBook(request: BookReturnRequest) {
         val user = userRepository.findByName(request.userName) ?: fail()
         user.returnBook(request.bookName)

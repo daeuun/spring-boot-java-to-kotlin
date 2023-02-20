@@ -72,6 +72,25 @@ class BookServiceTest @Autowired constructor(
     }
 
     @Test
+    @DisplayName("책 대출 성공 by GPT")
+    fun loanBookByGPTTest() {
+        //given
+        bookRepository.save(Book.fixture("긴긴밤"))
+        val savedUser = userRepository.save(User("daeun", null))
+        val request = BookLoanRequest("daeun", "긴긴밤")
+
+        //when
+        bookService.loanBookByGPT(request)
+
+        //then
+        val result = userLoanHistoryRepository.findAll()
+        assertThat(result).hasSize(1)
+        assertThat(result[0].bookName).isEqualTo("긴긴밤")
+        assertThat(result[0].user.id).isEqualTo(savedUser.id)
+        assertThat(result[0].status).isEqualTo(UserLoanStatus.LOANED)
+    }
+
+    @Test
     @DisplayName("책이 이미 대출되어 있다면, 신규 대출 실패")
     fun loanBookFailTest() {
         //given

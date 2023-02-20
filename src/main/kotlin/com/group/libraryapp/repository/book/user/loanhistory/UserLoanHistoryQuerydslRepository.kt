@@ -21,6 +21,15 @@ class UserLoanHistoryQuerydslRepository(
             .fetchOne()
     }
 
+    fun findModifiedByGPT(bookName: String, status: UserLoanStatus? = null): UserLoanHistory? =
+        queryFactory.selectFrom(userLoanHistory)
+            .where(
+                userLoanHistory.bookName.eq(bookName),
+                status?.let { userLoanHistory.status.eq(it) }
+            )
+            .orderBy(userLoanHistory.id.desc())
+            .fetchFirst()
+
     fun count(status: UserLoanStatus): Long {
         return queryFactory.select(userLoanHistory.count())
             .from(userLoanHistory)
